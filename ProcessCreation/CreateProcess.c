@@ -14,12 +14,12 @@ int main(int argc, char *argv[])
     bool shouldInheritHandles = true;                                       // IN
     DWORD creationFlags = 0;                                                // IN            // 0 means no creation flags. There are enums that you can bitwise OR together for this value.
     LPVOID environment = NULL;                                              // IN [OPTIONAL] // use the environment of the parent process
-    LPCTSTR currentDirectory;                                               // IN [OPTIONAL] // if null, same directory as parent
-    STARTUPINFO startupInfo = {sizeof(STARTUPINFO)};                        // IN                 
+    LPCTSTR currentDirectory = NULL;                                        // IN [OPTIONAL] // if null, same directory as parent
+    STARTUPINFO startupInfo = {sizeof(STARTUPINFO), 0};                     // IN                 
     PROCESS_INFORMATION processInformation = {0};                           // OUT
 
     // I'm not sure why I need any of these next three statements, they're on microsofts example, but the call is successful without them
-    //  The ZeroMemory calls aren't needed because we initialize the structs to {0} I think
+    //  The ZeroMemory calls aren't needed because we initialize the structs to {0} 
     //ZeroMemory( &startupInfo, sizeof(startupInfo) );
 
     // don't need to initialize cb here because we're already setting the size during initialization
