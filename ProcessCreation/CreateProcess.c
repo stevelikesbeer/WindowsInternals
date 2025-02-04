@@ -14,17 +14,13 @@ int main(int argc, char *argv[])
     bool shouldInheritHandles = true;                                       // IN
     DWORD creationFlags = 0;                                                // IN            // 0 means no creation flags. There are enums that you can bitwise OR together for this value.
     LPVOID environment = NULL;                                              // IN [OPTIONAL] // use the environment of the parent process
-    LPCTSTR currentDirectory;                                               // IN [OPTIONAL] // if null, same directory as parent
-    STARTUPINFO startupInfo = {sizeof(STARTUPINFO)};                        // IN                 
-    PROCESS_INFORMATION processInformation = {0};                           // OUT
+    LPCTSTR currentDirectory = NULL;                                        // IN [OPTIONAL] // if null, same directory as parent
 
-    // I'm not sure why I need any of these next three statements, they're on microsofts example, but the call is successful without them
-    //  The ZeroMemory calls aren't needed because we initialize the structs to {0} I think
-    //ZeroMemory( &startupInfo, sizeof(startupInfo) );
-
-    // don't need to initialize cb here because we're already setting the size during initialization
-    //startupInfo.cb = sizeof(startupInfo);
-    //ZeroMemory( &processInformation, sizeof(processInformation) );
+    LPSTARTUPINFO startupInfo = (LPSTARTUPINFO)malloc(sizeof(*startupInfo));
+    ZeroMemory(startupInfo, sizeof(*startupInfo)); 
+    startupInfo->cb = sizeof(*startupInfo);                  
+    LPPROCESS_INFORMATION processInformation = (LPPROCESS_INFORMATION)malloc(sizeof(*processInformation));  
+    ZeroMemory(processInformation, sizeof(*processInformation)); 
 
     if(!CreateProcess(applicationName, 
                   commandLine, 
@@ -34,20 +30,29 @@ int main(int argc, char *argv[])
                   creationFlags, 
                   environment, 
                   currentDirectory, 
-                  &startupInfo, 
-                  &processInformation))
+                  startupInfo, 
+                  processInformation))
     {
         DWORD lastError = GetLastError();
         puts("Creating process failed!");
         PrintFormattedErrorMessage(lastError);
+        free(startupInfo);
+        startupInfo = NULL;
+        free(processInformation);
+        processInformation = NULL;
         return EXIT_FAILURE;
     }
 
-    WaitForSingleObject( processInformation.hProcess, INFINITE );
+    WaitForSingleObject(processInformation->hProcess, INFINITE);
 
     // Close process and thread handles. 
-    CloseHandle( processInformation.hProcess );
-    CloseHandle( processInformation.hThread );
+    CloseHandle(processInformation->hProcess);
+    CloseHandle(processInformation->hThread);
+
+    free(startupInfo);
+    startupInfo = NULL;
+    free(processInformation);
+    processInformation = NULL;
 
     return EXIT_SUCCESS;
 }
@@ -72,6 +77,4 @@ void PrintFormattedErrorMessage(DWORD errorCode)
         {
             printf("\nError Code: %d \nError Message: %s \n", errorCode, errorMessage);
         }
-
-        return;
 }
