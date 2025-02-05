@@ -5,7 +5,7 @@
 
 void PrintFormattedErrorMessage( DWORD errorCode );
 
-int main( int argc, char* argv[] )
+int main( int argc, char *argv[] )
 {
     LPCTSTR applicationName = "C:\\Program Files\\Notepad++\\notepad++.exe"; // IN [OPTIONAL]
     LPTSTR commandLine = NULL;                                               // IN OUT [OPTIONAL]
@@ -26,16 +26,16 @@ int main( int argc, char* argv[] )
     // startupInfo.cb = sizeof(startupInfo);
     // ZeroMemory( &processInformation, sizeof(processInformation) );
 
-    if ( !CreateProcess( applicationName,
-                         commandLine,
-                         processAttributes,
-                         threadAttributes,
-                         shouldInheritHandles,
-                         creationFlags,
-                         environment,
-                         currentDirectory,
-                         &startupInfo,
-                         &processInformation ) )
+    if( !CreateProcess( applicationName,
+                        commandLine,
+                        processAttributes,
+                        threadAttributes,
+                        shouldInheritHandles,
+                        creationFlags,
+                        environment,
+                        currentDirectory,
+                        &startupInfo,
+                        &processInformation ) )
     {
         DWORD lastError = GetLastError();
         puts( "Creating process failed!" );
@@ -56,14 +56,13 @@ void PrintFormattedErrorMessage( DWORD errorCode )
 {
     LPTSTR errorMessage;
 
-    if ( !FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER + FORMAT_MESSAGE_FROM_SYSTEM,
-        NULL,
-        errorCode,
-        0,
-        ( LPTSTR ) &errorMessage,
-        0,
-        NULL ) )
+    if( !FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER + FORMAT_MESSAGE_FROM_SYSTEM,
+                        NULL,
+                        errorCode,
+                        0,
+                        ( LPTSTR ) &errorMessage,
+                        0,
+                        NULL ) )
     {
         puts( "Format message failed!" );
     }

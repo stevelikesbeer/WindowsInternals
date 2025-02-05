@@ -1,3 +1,10 @@
 {
-    "C_Cpp.errorSquiggles": "enabled"
+    "files.exclude": {
+        "*/*.exe": true,
+        "*.exe": true,
+        "*/*.png": true,
+        "*.png": true,
+        ".gitignore": true,
+        "*.code-workspace": true
+    }
 }
