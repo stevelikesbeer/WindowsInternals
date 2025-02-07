@@ -17,10 +17,18 @@ int main( int argc, char *argv[] )
         return EXIT_FAILURE;
     }
 
+    if( !SetPrivilege( userToken, SE_INCREASE_QUOTA_NAME, true ) )
+    {
+        DWORD errorCode = GetLastError();
+        puts( "Could not assign SE_INCREASE_QUOTA_NAME privilege!" );
+        PrintFormattedErrorMessage( errorCode );
+        return EXIT_FAILURE;
+    }
+
     // if( !SetPrivilege( userToken, SE_ASSIGNPRIMARYTOKEN_NAME, true ) )
     // {
     //     DWORD errorCode = GetLastError();
-    //     puts( "Could not assign privilege!" );
+    //     puts( "Could not assign SE_ASSIGNPRIMARYTOKEN_NAME privilege!" );
     //     PrintFormattedErrorMessage( errorCode );
     //     return EXIT_FAILURE;
     // }
@@ -68,7 +76,7 @@ bool SetPrivilege( HANDLE hToken, LPCTSTR privilege, bool isEnabled )
     LUID luid;
     if( !LookupPrivilegeValue( NULL,        // look up privilege on local system
                                privilege,   // name of the privilege
-                               &luid ) )    // recieves the local uid of the pvivilege
+                               &luid ) )    // recieves the local uid of the privilege
     {
         DWORD errorCode = GetLastError();
         puts( "Could not find privilege!" );

@@ -1,10 +1,13 @@
+// ******************************************************************************************************
+// this file doesn't work because I need to call ntoskrnl.exe directly (and not ntdll.dll like I thought)
+//   and can't easily from user mode
+// ******************************************************************************************************
+
 #include <stdlib.h>
 #include <windows.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "EProcessInclude.h"
-//#include <wdm.h>
-//#include <winternl.h>
+#include "EProcessIncludes/EProcess.h"
 #include <libloaderapi.h>
 
 void PrintFormattedErrorMessage( DWORD errorCode );
@@ -13,7 +16,6 @@ void TestingEPROCESS( HANDLE hProcess );
 //NTSTATUS PsLookupProcessByProcessId( HANDLE ProcessId, PEPROCESS *Process );
 typedef NTSTATUS( WINAPI *PsLookupProcessByProcessId )( HANDLE ProcessId, PEPROCESS *Process );
 
-// this doesn't work because I need to call ntoskrnl.exe directly and can't easily from user mode
 int main( int argc, char *argv[] )
 {
     LPCTSTR applicationName = "C:\\Program Files\\Notepad++\\notepad++.exe"; // IN [OPTIONAL]
@@ -65,13 +67,10 @@ int main( int argc, char *argv[] )
 
 void TestingEPROCESS( HANDLE hProcess )
 {
-
-    //NtCreateFile _NtCreateFile = ( NtCreateFile ) GetProcAddress( GetModuleHandle( "ntdll.dll" ), "NtCreateFile" );
     //HMODULE ntdll = LoadLibrary( "ntdll.dll" );
     //void *test = GetProcAddress( ntdll, "PsLookupProcessByProcessId" );
     //NTSTATUS( *fpPsLookupProcessByProcessId )( HANDLE, PEPROCESS * ) = GetProcAddress( ntdll, "PsLookupProcessByProcessId" );
     //NTSTATUS FARPROC *test( HANDLE, PEPROCESS * ) = GetProcAddress( ntdll, "PsLookupProcessByProcessId" );
-
 
     // it turns out PsLookupProcessByProcessId is in ntoskrnl and not ntdll.dll, oh well it fun was trying. This can't be done so easily
     HMODULE ntdll = LoadLibrary( "ntdll.dll" );
@@ -91,19 +90,6 @@ void TestingEPROCESS( HANDLE hProcess )
     }
     puts( "Successfully called the psLookupProcessByProcessId function!" );
 }
-
-// this is what was on the site, writing it down so i can close the tab
-// PEPROCESS GetProcessFromPid( DWORD processId )
-// {
-//     PEPROCESS process;
-//     // if( PsLookupProcessByProcessId( processId, &process ) != 0 ) // from the website but i think this is wrong
-//     // {
-//     //     puts( "failed to get process from pid" );
-//     //     return NULL;
-//     // }
-
-//     return process;
-// }
 
 void PrintFormattedErrorMessage( DWORD errorCode )
 {
