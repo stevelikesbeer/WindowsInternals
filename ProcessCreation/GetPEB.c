@@ -37,6 +37,7 @@ int main( int argc, char *argv[] )
         //      The name of the field pointed to by Address and which is contained in a structure of type Type.
         LDR_DATA_TABLE_ENTRY *entry = ( LDR_DATA_TABLE_ENTRY * ) CONTAINING_RECORD( ldrDataCurrent, LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks );
         printf( "Full DLL Name:\t %wZ\n", &entry->FullDllName );
+        // There are more fields that we can't see in the enum. See EProcessIncludes/LdrDataTableOffsets.txt
 
         ldrDataCurrent = ldrDataCurrent->Flink;
     }
