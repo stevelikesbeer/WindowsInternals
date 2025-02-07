@@ -23,10 +23,6 @@ int main( int argc, char *argv[] )
     ldrDataCurrent = ldrDataCurrent->Flink;
     while( ldrDataCurrent != ldrDataHead ) // it's a circular linked list, make sure we don't loop forever.
     {
-        //the next/back pointers don't point to the head of the object (which is common in most implementations); 
-        //so in order to get to the head of the object you have to do a fixup on the pointer based on the offset 
-        //of the LIST_ENTRY member. This is where the CONTAINING_RECORD macro comes into use
-
         //The CONTAINING_RECORD macro returns the base address of an instance of a structure given the type of the 
         // structure and the address of a field within the containing structure
         // > address [in] 
@@ -35,6 +31,12 @@ int main( int argc, char *argv[] )
         //      The name of the type of the structure whose base address is to be returned.
         // > field [in] 
         //      The name of the field pointed to by Address and which is contained in a structure of type Type.
+
+        // In my own words: we have ldrDataCurrent. This is a field in some LDR_DATA_TABLE_ENTRY struct. We want to get a reference to ldrDataCurrent's parent struct.
+        //   So, we pass in our ldrDataCurrent (the address of it), we say what the parent struct type is (LDR_DATA_TABLE_ENTRY), 
+        //   then we tell the CONTAINING_RECORD function that in the LDR_DATA_TABLE_ENTRY struct, the ldrDataCurrent instance is the field name `InMemoryOrderLinks`
+        //   this allows CONTAINING_RECORD to use that data to provide us the base address of ldrDataCurrent's parent (in our case LDR_DATA_TABLE_ENTRY)
+        // It's basically taking our ldrDataCurrent, and calculating a negative offset to find the base of the parent
         LDR_DATA_TABLE_ENTRY *entry = ( LDR_DATA_TABLE_ENTRY * ) CONTAINING_RECORD( ldrDataCurrent, LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks );
         printf( "Full DLL Name:\t %wZ\n", &entry->FullDllName );
         // There are more fields that we can't see in the enum. See EProcessIncludes/LdrDataTableOffsets.txt
