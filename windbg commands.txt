@@ -1,0 +1,83 @@
+lm  [options]               - load module / search loaded modules
+                                [Options]:
+                                    sm      - Sorts the modules by name
+                                    i       - Shows only image names
+                                    f       - Shows full image path
+                                    m       - specifies pattern of the module you want to find
+                                            For example `lm m s*` for all modules that start with s
+
+ln [Address]                - List the nearest symbols. You can use the ln command to help determine what a pointer is pointing to.
+
+.reload /f /s               - reloads kernel symbols (deffered)
+                                Most of the time, you wont need to reload the symbols for the whole kernel space, 
+                                since theoretically only the kernel binary (nt) provides the APIs that will be called. 
+                                You should just do x and then if you don't have a proper answer then try to reload the 
+                                other modules symbolic information
+
+ld [ModuleName]             - Load symbols for module name. It is LD lowercase.
+
+x [Options] Module!Symbol   - examines symbols
+                                Examples: `x nt!*`      examine all symbols in nt module
+                                          `x nt!*Ldr*`  examine all symbols that contain "Ldr" in nt module
+                                [Options]
+                                    /v      - Displays the symbol type (local, global, parameter, function, or unknown)
+                                    /t      - Displays the data type of each symbol, if known
+                                    /0      - Displays only the address of each symbol
+                                    /1      - Displays only the name if each symbol
+                                    /2      - Displays only the address and name of each symbol (not the datatype)
+                                    /f      - Displays the data size of a function
+                                    /n      - Sort by the display name, ascending order
+.cls                        - clears the screen
+
+g                           - Go. Continue debugging.
+bl                          - List Breakpoints
+
+k                           - View Callstack
+r                           - View Registers
+dt                          - Information about Variables
+                                Example: `dt ntdll!_PEB*`       - List all variables that contain the word _PEB
+                                         `dt ntdll!_PEB* -v`    - Same but verbose output
+
+.logopen C:\Users\Coke\Desktop\sysinternals\LiveKD\testlog.txt
+.logclose
+
+dx                          - The dx command displays a C++ expression using the NatVis extension model. 
+                            - https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/dx--display-visualizer-variables-
+                            - This is pretty much Linq but for the debugger?
+                            dx Debugger.Utility.Control.ExecuteCommand("lm sm i")
+
+                            dx @$vars  to view all custom variables (dx @$somevar=test)
+                            dx @$vars.Remove("somevar")
+                            dx @$vars.Clear()   clears all
+
+
+The nt module is the kernel, but for some reason its not ntoskrnl.exe, it's 
+
+A lot more commands at: http://windbg.info/doc/1-common-cmds.html
+
+
+View the KPCR:
+dt nt!_KPCR @$pcr
+
+View the eprocess:
+dt nt!_eprocess [memorylocation]
+
+view the kprocess:
+dt nt!_kprocess [memorylocation?]
+
+view specific fields - end in period
+dt nt!_eprocess pcb.        (datatype of process control block is kprocess)
+
+View the PEB:
+!peb  
+
+view specific process?
+!process 0 0 csrss.exe
+
+
+to point to the particular process so that its user mode modules are visible: (specifically using this for the csr_process)
+.process /r /P [memoryAddress - from view specific process command, or just !process 0 0]
+
+^ The /p switch changes the process context of the debugger to the provided process object  (EPROCESS, mostly needed in live debugging) 
+      /r requests loading of user mode symbols. 
+ 
