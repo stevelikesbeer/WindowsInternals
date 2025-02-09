@@ -2,3 +2,4 @@
 *.obj
 *.lnk
 *.pdf
+/SysInternals/**
